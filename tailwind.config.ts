@@ -1,3 +1,8 @@
+const {
+  default: flattenColorPalette,
+} = require("tailwindcss/lib/util/flattenColorPalette");
+const svgToDataUri = require("mini-svg-data-uri");
+
 import type { Config } from "tailwindcss";
 
 const config = {
@@ -65,21 +70,62 @@ const config = {
           },
         },
         "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        aurora: {
           from: {
-            opacity: "0",
+            backgroundPosition: "50% 50%, 50% 50%",
           },
           to: {
-            opacity: "1",
+            backgroundPosition: "350% 50%, 350% 50%",
           },
         },
       },
       animation: {
         marquee: "marquee var(--marquee-duration) linear infinite",
         "fade-in": "fade-in 0.5s linear forwards",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        aurora: "aurora 60s linear infinite",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    addVariablesForColors,
+    function ({ matchUtilities, theme }: any) {
+      matchUtilities(
+        {
+          "bg-dot-thick": (value: any) => ({
+            backgroundImage: `url("${svgToDataUri(
+              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="16" height="16" fill="none"><circle fill="${value}" id="pattern-circle" cx="10" cy="10" r="2.5"></circle></svg>`
+            )}")`,
+          }),
+        },
+        { values: flattenColorPalette(theme("backgroundColor")), type: "color" }
+      );
+    },
+  ],
 } satisfies Config;
+
+function addVariablesForColors({ addBase, theme }: any) {
+  let allColors = flattenColorPalette(theme("colors"));
+  let newVars = Object.fromEntries(
+    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
+  );
+
+  addBase({
+    ":root": newVars,
+  });
+}
 
 export default config;
