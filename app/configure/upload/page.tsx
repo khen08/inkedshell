@@ -8,6 +8,7 @@ import { Image, Loader2, MousePointerSquareDashed } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import Dropzone, { FileRejection } from "react-dropzone";
+import heic2any from "heic2any";
 
 const Page = () => {
   const { toast } = useToast();
@@ -39,8 +40,41 @@ const Page = () => {
     });
   };
 
-  const onDropAccepted = (acceptedFiles: File[]) => {
-    startUpload(acceptedFiles, { configId: undefined });
+  const onDropAccepted = async (acceptedFiles: File[]) => {
+    const convertedFiles = await Promise.all(
+      acceptedFiles.map(async (file) => {
+        if (file.type === "image/heic" || file.type === "image/heif") {
+          try {
+            const convertedBlob = await heic2any({
+              blob: file,
+              toType: "image/png",
+            });
+
+            const blob = Array.isArray(convertedBlob)
+              ? new Blob(convertedBlob, { type: "image/png" })
+              : convertedBlob;
+
+            return new File([blob], file.name.replace(/\.[^/.]+$/, ".png"), {
+              type: "image/png",
+            });
+          } catch (error) {
+            console.error("HEIC conversion failed:", error);
+            toast({
+              title: "Conversion failed",
+              description: "An error occurred while converting the HEIC file.",
+              variant: "destructive",
+            });
+            return null;
+          }
+        }
+        return file;
+      })
+    );
+
+    const validFiles = convertedFiles.filter((file) => file !== null);
+    if (validFiles.length > 0) {
+      startUpload(validFiles as File[], { configId: undefined });
+    }
 
     setIsDragOver(false);
   };
@@ -64,6 +98,8 @@ const Page = () => {
             "image/png": [".png"],
             "image/jpeg": [".jpeg"],
             "image/jpg": [".jpg"],
+            "image/heic": [".heic"],
+            "image/heif": [".heif"],
           }}
           onDragEnter={() => setIsDragOver(true)}
           onDragLeave={() => setIsDragOver(false)}
@@ -107,7 +143,9 @@ const Page = () => {
               </div>
 
               {isPending ? null : (
-                <p className="text-xs text-zinc-500">PNG, JPG, JPEG</p>
+                <p className="text-xs text-zinc-500">
+                  PNG, JPG, JPEG, HEIC, HEIF
+                </p>
               )}
             </div>
           )}
@@ -116,7 +154,5 @@ const Page = () => {
     </div>
   );
 };
+
 export default Page;
-function startUpload(acceptedFiles: File[], arg1: { configId: undefined }) {
-  throw new Error("Function not implemented.");
-}
