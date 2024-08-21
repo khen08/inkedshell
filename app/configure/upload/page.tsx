@@ -6,9 +6,8 @@ import { useUploadThing } from "@/lib/uploadthing";
 import { cn } from "@/lib/utils";
 import { Image, Loader2, MousePointerSquareDashed } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import Dropzone, { FileRejection } from "react-dropzone";
-import heic2any from "heic2any";
 
 const Page = () => {
   const { toast } = useToast();
@@ -41,6 +40,8 @@ const Page = () => {
   };
 
   const onDropAccepted = async (acceptedFiles: File[]) => {
+    const heic2any = (await import("heic2any")).default;
+
     const convertedFiles = await Promise.all(
       acceptedFiles.map(async (file) => {
         if (file.type === "image/heic" || file.type === "image/heif") {
