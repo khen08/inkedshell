@@ -43,8 +43,11 @@ const DesignPreview = ({
   )!;
 
   let totalPrice = BASE_PRICE;
+  if (material === "plastic") totalPrice += PRODUCT_PRICES.material.plastic;
+  if (material === "silicone") totalPrice += PRODUCT_PRICES.material.silicone;
   if (material === "polycarbonate")
     totalPrice += PRODUCT_PRICES.material.polycarbonate;
+  if (finish === "smooth") totalPrice += PRODUCT_PRICES.finish.smooth;
   if (finish === "textured") totalPrice += PRODUCT_PRICES.finish.textured;
 
   const { mutate: createPaymentSession } = useMutation({
