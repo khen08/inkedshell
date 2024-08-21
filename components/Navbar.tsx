@@ -38,7 +38,7 @@ const Navbar = async () => {
                       variant: "ghost",
                     })}
                   >
-                    Dashboard
+                    Dashboard ✨
                   </LogoutLink>
                 ) : null}
                 <Link
