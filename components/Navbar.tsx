@@ -32,14 +32,15 @@ const Navbar = async () => {
                   Sign Out
                 </LogoutLink>
                 {isAdmin ? (
-                  <LogoutLink
+                  <Link
+                    href="/dashboard"
                     className={buttonVariants({
                       size: "sm",
                       variant: "ghost",
                     })}
                   >
                     Dashboard ✨
-                  </LogoutLink>
+                  </Link>
                 ) : null}
                 <Link
                   href="/configure/upload"
