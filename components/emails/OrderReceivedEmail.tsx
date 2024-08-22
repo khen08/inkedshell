@@ -27,7 +27,7 @@ const OrderReceivedEmail = ({
   const baseUrl =
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://casecobra.vercel.app";
+      : "https://inkedshell.vercel.app";
 
   return (
     <Html>
