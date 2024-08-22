@@ -42,5 +42,6 @@ export function constructMetadata({
       creator: "@keheeeen",
     },
     icons,
+    metadataBase: new URL("https://inkedshell.vercel.app/"),
   };
 }
